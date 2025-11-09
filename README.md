@@ -1,4 +1,4 @@
-# Appointment Scheduling – Django + Postgres + DRF
+# Appointment Scheduling – Django + Postgres
 
 A production-ready starter that exposes a REST API for booking, rescheduling, listing, and cancelling 30-minute appointment slots. The project uses Poetry for dependency management, PostgreSQL for persistence, and Django REST Framework to serve the API.
 
@@ -101,7 +101,6 @@ All configuration is loaded from `.env` at start-up. Defaults are aimed at local
 | `DATABASE_SSL_REQUIRE` | Force SSL for DB connection | `false` |
 | `CORS_ALLOWED_ORIGINS` | Allowed front-end origins | `http://localhost:3000,http://127.0.0.1:3000` |
 | `CORS_ALLOW_CREDENTIALS` | Include cookies/credentials in CORS responses | `false` |
-| `CRONTAB_COMMAND_PREFIX` | Optional prefix for cron commands (e.g. virtualenv activation) | _(blank)_ |
 
 > **Pro tip:** For production, set `DJANGO_DEBUG=false`, generate a strong `DJANGO_SECRET_KEY`, and adjust `DJANGO_ALLOWED_HOSTS`.
 
