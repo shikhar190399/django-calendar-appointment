@@ -32,8 +32,6 @@ Update `.env` with your database URL, secret key, and CORS origins.
 
 ```bash
 poetry run python manage.py migrate
-# Optional: create an admin user for the Django admin site
-poetry run python manage.py createsuperuser
 ```
 
 The default database URL is `postgresql://postgres:postgres@localhost:5432/appointment_scheduling`. Override `DATABASE_URL` in `.env` for production/hosted instances.
@@ -52,6 +50,7 @@ API base URL (default): `http://127.0.0.1:8000/api/`
 poetry run pytest           # unit/integration tests
 poetry run black .          # formatting (already configured)
 poetry run isort .          # import sorting
+poetry run python manage.py crontab show   # list scheduled cron jobs
 ```
 
 ## 6. REST API reference
@@ -102,6 +101,7 @@ All configuration is loaded from `.env` at start-up. Defaults are aimed at local
 | `DATABASE_SSL_REQUIRE` | Force SSL for DB connection | `false` |
 | `CORS_ALLOWED_ORIGINS` | Allowed front-end origins | `http://localhost:3000,http://127.0.0.1:3000` |
 | `CORS_ALLOW_CREDENTIALS` | Include cookies/credentials in CORS responses | `false` |
+| `CRONTAB_COMMAND_PREFIX` | Optional prefix for cron commands (e.g. virtualenv activation) | _(blank)_ |
 
 > **Pro tip:** For production, set `DJANGO_DEBUG=false`, generate a strong `DJANGO_SECRET_KEY`, and adjust `DJANGO_ALLOWED_HOSTS`.
 
@@ -111,6 +111,7 @@ All configuration is loaded from `.env` at start-up. Defaults are aimed at local
 - Configure environment variables (`DATABASE_URL`, etc.)
 - Apply migrations: `poetry run python manage.py migrate`
 - Collect static assets if serving via Django: `poetry run python manage.py collectstatic`
+- Register cron jobs: `poetry run python manage.py crontab add` (and `crontab show` to verify)
 - Configure a WSGI/ASGI server (Gunicorn/Uvicorn) behind a reverse proxy
 - Ensure CORS origins match deployed front-end URLs
 - (Optional) add monitoring, logging, and scheduled jobs if needed

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
+    "django_crontab",
     "rest_framework",
     "apps.appointments",
 ]
@@ -133,4 +134,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
+
+# Cron configuration
+
+CRONJOBS = [
+    ("*/30 * * * *", "apps.appointments.cron.keep_alive_job"),
+]
+
 
