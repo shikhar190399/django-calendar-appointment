@@ -1,3 +1,9 @@
+"""Utility helpers for appointment scheduling logic.
+
+These functions centralize slot generation, validation, and serialization so
+view code can stay thin and focused on HTTP concerns.
+"""
+
 from datetime import datetime, time, timedelta
 from typing import List
 
@@ -14,11 +20,12 @@ WEEKDAY_RANGE = range(0, 5)  # Monday (0) through Friday (4)
 
 
 def _make_aware(dt: datetime, tz) -> datetime:
+    """Ensure the provided datetime has timezone info attached."""
     return dt if timezone.is_aware(dt) else timezone.make_aware(dt, tz)
 
 
 def get_current_week_range() -> tuple[datetime, datetime]:
-    """Return the timezone-aware start and end datetimes for the current work week."""
+    """Return the aware datetimes marking the current work-week boundaries."""
     now = timezone.localtime(timezone.now())
     tz = now.tzinfo
 
@@ -43,7 +50,7 @@ def get_week_range(offset_weeks: int = 0) -> tuple[datetime, datetime]:
 
 
 def generate_business_slots(week_start: datetime) -> List[datetime]:
-    """Generate 30-minute slots for the work week starting at week_start."""
+    """Yield every 30-minute slot within a work week starting from `week_start`."""
     slots: List[datetime] = []
     tz = week_start.tzinfo
     start_date = week_start.date()
@@ -61,6 +68,7 @@ def generate_business_slots(week_start: datetime) -> List[datetime]:
 
 
 def serialize_appointment(appointment: Appointment) -> dict:
+    """Render an appointment instance into a JSON-serializable dict."""
     start_time = timezone.localtime(appointment.start_time)
     created_at = timezone.localtime(appointment.created_at)
     return {
@@ -75,6 +83,7 @@ def serialize_appointment(appointment: Appointment) -> dict:
 
 
 def validate_slot(slot: datetime) -> None:
+    """Ensure the provided datetime represents a valid, bookable slot."""
     now = timezone.now()
     if slot < now:
         raise ValidationError("Cannot book an appointment in the past.")
@@ -97,6 +106,7 @@ def validate_slot(slot: datetime) -> None:
 
 
 def parse_start_time(value: str) -> datetime:
+    """Parse an ISO8601 datetime string into an aware datetime."""
     parsed = parse_datetime(value)
     if parsed is None:
         raise ValidationError("Invalid datetime format. Use ISO 8601 (e.g. 2024-01-01T13:30:00Z).")
@@ -106,7 +116,7 @@ def parse_start_time(value: str) -> datetime:
 
 
 def get_future_slots(weeks_ahead: int = 2) -> List[datetime]:
-    """Return combined slots for the current week and the following `weeks_ahead - 1` weeks."""
+    """Return combined slots for the current week and the following weeks."""
     slots: List[datetime] = []
     for offset in range(weeks_ahead):
         week_start, _ = get_week_range(offset)

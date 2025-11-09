@@ -1,3 +1,5 @@
+"""REST API views for managing appointment bookings."""
+
 from datetime import datetime, timedelta
 from typing import Set
 
@@ -21,10 +23,13 @@ from apps.appointments.tasks.appointments_tasks import (
 
 
 class AppointmentCollectionView(APIView):
+    """List and create appointments scoped to a calendar week."""
+
     authentication_classes: list = []
     permission_classes: list = []
 
     def get(self, request, *args, **kwargs) -> Response:
+        """Return appointments for the requested week (default: current)."""
         page_param = request.query_params.get("page", "0")
         try:
             week_offset = int(page_param)
@@ -56,6 +61,7 @@ class AppointmentCollectionView(APIView):
         return Response(response_payload, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs) -> Response:
+        """Create a new appointment enforcing validation rules."""
         try:
             payload = request.data or {}
             start_time_raw = payload.get("start_time")
@@ -96,10 +102,13 @@ class AppointmentCollectionView(APIView):
 
 
 class AvailableSlotsView(APIView):
+    """Expose paginated availability for booking slots."""
+
     authentication_classes: list = []
     permission_classes: list = []
 
     def get(self, request, *args, **kwargs) -> Response:
+        """Return available slots for the specified week (default: current)."""
         page_param = request.query_params.get("page", "0")
         try:
             week_offset = int(page_param)
@@ -144,16 +153,20 @@ class AvailableSlotsView(APIView):
 
 
 class AppointmentDetailView(APIView):
+    """Retrieve, update, or delete a single appointment."""
+
     authentication_classes: list = []
     permission_classes: list = []
 
     def get_object(self, appointment_id: int) -> Appointment:
+        """Fetch an appointment or raise a validation error if missing."""
         try:
             return Appointment.objects.get(pk=appointment_id)
         except Appointment.DoesNotExist as exc:
             raise ValidationError("Appointment not found.") from exc
 
     def get(self, request, appointment_id: int, *args, **kwargs) -> Response:
+        """Return serialized data for a single appointment."""
         try:
             appointment = self.get_object(appointment_id)
         except ValidationError as exc:
@@ -161,6 +174,7 @@ class AppointmentDetailView(APIView):
         return Response(serialize_appointment(appointment), status=status.HTTP_200_OK)
 
     def patch(self, request, appointment_id: int, *args, **kwargs) -> Response:
+        """Partially update appointment details or reschedule to a free slot."""
         try:
             appointment = self.get_object(appointment_id)
         except ValidationError as exc:
@@ -234,6 +248,7 @@ class AppointmentDetailView(APIView):
         return Response(serialize_appointment(appointment), status=status.HTTP_200_OK)
 
     def delete(self, request, appointment_id: int, *args, **kwargs) -> Response:
+        """Cancel an appointment."""
         try:
             appointment = self.get_object(appointment_id)
         except ValidationError as exc:
