@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 
 def main() -> None:
+    """Load environment variables and hand off to Django's CLI."""
     project_root = Path(__file__).resolve().parent
     load_dotenv(project_root / ".env")
 
